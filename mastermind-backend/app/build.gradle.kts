@@ -8,6 +8,9 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    kotlin("jvm") version "1.9.22"
+    id("org.springframework.boot") version "3.2.3"
+    id("io.spring.dependency-management") version "1.1.4"
 }
 
 repositories {
@@ -23,7 +26,11 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
-    implementation("org.springframework.boot:spring-boot-starter-web:3.2.3") 
+    implementation("org.springframework.boot:spring-boot-starter-web:3.2.3")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis:3.2.3")
+    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+    implementation("redis.clients:jedis:5.1.1")
+    implementation("org.slf4j:slf4j-api:2.0.12")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
