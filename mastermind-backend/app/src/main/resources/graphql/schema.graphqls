@@ -1,0 +1,10 @@
+type Query {
+    getGameEventByGameSessionId(gameSessionId: String!): [GameEvent]
+}
+
+type GameEvent {
+    id: ID
+    gameSessionId: String
+    timestamp: String
+    description: String
+}

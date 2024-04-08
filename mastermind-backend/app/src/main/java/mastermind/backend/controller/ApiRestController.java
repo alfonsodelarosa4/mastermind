@@ -33,9 +33,9 @@ public class ApiRestController {
     private static final Logger logger = LoggerFactory.getLogger(ApiRestController.class);
 
     public ApiRestController(
-        GameSessionRepository gameSessionRepository,
-        SimpMessagingTemplate template,
-        GameEventService gameEventService
+            GameSessionRepository gameSessionRepository,
+            SimpMessagingTemplate template,
+            GameEventService gameEventService
         ) {
         this.gameSessionRepository = gameSessionRepository;
         this.template = template;

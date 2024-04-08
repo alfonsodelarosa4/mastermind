@@ -36,6 +36,8 @@ dependencies {
     // MongoDB
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.2.3")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.3")
+    // GraphQL
+    implementation("org.springframework.boot:spring-boot-starter-graphql:3.2.3")
     // Misc
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
     implementation("org.slf4j:slf4j-api:2.0.12")
