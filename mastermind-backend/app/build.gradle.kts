@@ -28,6 +28,8 @@ dependencies {
     implementation(libs.guava)
     // Web
     implementation("org.springframework.boot:spring-boot-starter-web:3.2.3")
+    // WebClient
+    implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.3")
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis:3.2.3")
     implementation("redis.clients:jedis:5.1.1")

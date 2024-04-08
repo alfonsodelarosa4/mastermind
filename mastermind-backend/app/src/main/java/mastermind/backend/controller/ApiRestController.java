@@ -1,6 +1,7 @@
 package mastermind.backend.controller;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -8,6 +9,7 @@ import mastermind.backend.model.GameEvent;
 import mastermind.backend.model.GameSession;
 import mastermind.backend.repository.GameSessionRepository;
 import mastermind.backend.service.GameEventService;
+import mastermind.backend.service.RandomApiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +25,10 @@ public class ApiRestController {
 
     @Autowired
     private GameSessionRepository gameSessionRepository;
-
     @Autowired
     private GameEventService gameEventService;
-
+    @Autowired
+    private RandomApiService randomApiService;
     @Autowired
     private final SimpMessagingTemplate template;
 
@@ -35,21 +37,30 @@ public class ApiRestController {
     public ApiRestController(
             GameSessionRepository gameSessionRepository,
             SimpMessagingTemplate template,
-            GameEventService gameEventService
+            GameEventService gameEventService,
+            RandomApiService randomApiService
         ) {
         this.gameSessionRepository = gameSessionRepository;
         this.template = template;
         this.gameEventService = gameEventService;
+        this.randomApiService = randomApiService;
     }
 
     // creates game session
     @PostMapping("/game-session")
-    public ResponseEntity<GameSession> addGameSession() {
+    public ResponseEntity<Map<String, String>> addGameSession() {
         logger.info("REST POST: /game-session");
-        GameSession gameSession = new GameSession("1234");
+        // generate number
+        String answer = randomApiService.getRandomInteger(4,0,7);
+        // create game session
+        GameSession gameSession = new GameSession(answer);
         logger.info("Created: {}", gameSession);
+        // store to redis
         gameSessionRepository.save(gameSession);
-        return ResponseEntity.ok(gameSession);
+        // create json body
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("gameSessionId", gameSession.getId());
+        return ResponseEntity.ok(responseBody);
     }
 
     // for learning purposes
@@ -113,5 +124,5 @@ public class ApiRestController {
             logger.error("Not able to retrieve game events of game session: {}", gameSessionId);
             return Collections.emptyList();
         }
-    }    
+    }
 }
