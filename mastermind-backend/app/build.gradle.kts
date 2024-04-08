@@ -31,6 +31,7 @@ dependencies {
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
     implementation("redis.clients:jedis:5.1.1")
     implementation("org.slf4j:slf4j-api:2.0.12")
+    implementation("org.springframework.boot:spring-boot-starter-websocket:3.2.3")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
