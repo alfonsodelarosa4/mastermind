@@ -26,12 +26,19 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
+    // Web
     implementation("org.springframework.boot:spring-boot-starter-web:3.2.3")
+    // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis:3.2.3")
-    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
     implementation("redis.clients:jedis:5.1.1")
-    implementation("org.slf4j:slf4j-api:2.0.12")
+    // Websocket
     implementation("org.springframework.boot:spring-boot-starter-websocket:3.2.3")
+    // MongoDB
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.2.3")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.3")
+    // Misc
+    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+    implementation("org.slf4j:slf4j-api:2.0.12")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
