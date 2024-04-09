@@ -34,5 +34,10 @@ public class GameSessionRepository {
     public Optional<GameSession> findById(String id) {
         GameSession gameSession = hashOperations.get(id, HASH_KEY);
         return Optional.ofNullable(gameSession);
-    }    
+    }
+
+    // delete GameSession from redis
+    public void delete(String id) {
+        hashOperations.delete(HASH_KEY, id);
+    }
 }

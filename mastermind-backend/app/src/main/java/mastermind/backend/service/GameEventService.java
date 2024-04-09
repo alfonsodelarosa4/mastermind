@@ -44,5 +44,4 @@ public class GameEventService {
             return Collections.emptyList();
         }
     }
-    
 }

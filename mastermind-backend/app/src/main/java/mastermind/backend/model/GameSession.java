@@ -9,14 +9,16 @@ public class GameSession implements Serializable {
     @Id
     private String id;
     private String answer;
+    private int attempts;
 
     public GameSession() {
         this.id = generateId();
     }
     
-    public GameSession(String answer) {
+    public GameSession(String answer, int attempts) {
         this();
         this.answer = answer;
+        this.attempts = attempts;
     }
 
     public String getId() {
@@ -33,6 +35,14 @@ public class GameSession implements Serializable {
 
     public void setAnswer(String answer) {
         this.answer = answer;
+    }
+
+    public int getAttempts() {
+        return attempts;
+    }
+
+    public void setAttempts(int attempts) {
+        this.attempts = attempts;
     }
 
     // generates random id
