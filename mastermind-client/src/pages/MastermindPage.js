@@ -7,18 +7,20 @@ import { CelebrateWin } from "../component/CelebrateWin";
 
 export default function MastermindPage() {
   const gameSession = useSelector((state => state.gameSession));
-  // if now game session, take user back to home page
-  if (gameSession.id == null) {
-    console.log(gameSession.id);
-    return (<Button href="/" >Go back home</Button>)
-  }
 
+  if (gameSession.id == null) {
+    return (
+      <GamePageContainer>  
+        <Button href="/" >Go back home</Button>
+      </GamePageContainer>
+    )
+  }
   return (
-    <GamePageContainer>
+    <GamePageContainer>    
       <CelebrateWin />
       <OutcomeCard />
       <GuessForm />
-    </GamePageContainer>
+    </GamePageContainer> 
   )
 }
 

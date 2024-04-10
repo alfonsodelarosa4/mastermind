@@ -35,7 +35,7 @@ export default function OutcomeCard () {
 
         cardProperties = {
           color: "primary",
-          title: "Close, but not quiet",
+          title: "Close, but not quite",
           body: body
         };
         isOutcomeMessage = true;

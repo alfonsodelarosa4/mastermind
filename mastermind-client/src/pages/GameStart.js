@@ -12,7 +12,7 @@ export default function GameStart() {
 
   // creates game session
   const startGameSession = async () => {
-    const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/game-session`);
+    const response = await axios.post("http://localhost:8080/api/game-session");
     const {data} = response;    
     console.log(response);
     dispatch(updateGameSession(data));
@@ -20,7 +20,6 @@ export default function GameStart() {
 
   // if gameSession present, go to Mastermind page
   if (gameSession.id !== null) {
-    console.log(gameSession);
     return <Navigate to="game" />
   }
 

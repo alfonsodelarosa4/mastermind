@@ -17,10 +17,14 @@ export const gameSessionSlice = createSlice({
     updateAttempts: (state, action) => {
       const { attempts } = action.payload;
       state.attempts = attempts;
+    },
+    emptyGameSession: (state) => {
+      state.id = null;
+      state.attempts = null;
     }
   },
 });
 
-export const { updateGameSession, updateAttempts } = gameSessionSlice.actions
+export const { updateGameSession, updateAttempts, emptyGameSession } = gameSessionSlice.actions
 
 export default gameSessionSlice.reducer
