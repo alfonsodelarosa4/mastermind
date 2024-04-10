@@ -20,11 +20,11 @@ The following technologies are required to run the application:
 1. Open a terminal
 2. Run Docker container of Redis
 ```
-docker run -d --name redis-container -p 6379:6379
+docker run -d --name redis-container -p 6379:6379 redis
 ```
 3. Run Docker container of MongoDB
 ```
-docker run -d --name mongo-container -p 27017:27017
+docker run -d --name mongo-container -p 27017:27017 mongo
 ```
 ### 3. Build and run Java Spring App with Gradle
 1. Open a terminal (or use the same one)
@@ -54,7 +54,7 @@ npm start
 3. You have 10 attempts to guess the correct number. Enter your guess in the text box. Then press enter to submit.
 4. After pressing submit, you should receive a response from the Spring server
 
-## Development Process
+## Project Development
 ### 1. Understanding the challenge
 Before doing anything, I spent time reading the challenge requirements and made sure that I understood what was being asked. These were my findings:
 
@@ -64,7 +64,7 @@ Before doing anything, I spent time reading the challenge requirements and made 
 - Player must guess the right number of combinations within 10 attempts.
 
 **SERVER:**
-- At game start, server will generate 4 nums from a total of 8 different numbers
+- At game start, server will generate 4 numbers from a total of 8 different numbers
 - Server must use Random generator API
 - Server will generate a feedback response.
     - The player had guess a correct number
@@ -101,13 +101,57 @@ Even though these technologies are great for implementing backend applications, 
 Even though I have not had experiences working with these technologies, I spent several hours understanding how Java Spring can utilize these technologies.
 ### 3. Tradeoffs and decisions
 **COMMUNICATION:**
-- **REST**: REST is ideal when a client want to access simple data sources. Therefore, REST will be used to start and retrieve the game session information.
+- **REST:** REST is ideal when a client want to access simple data sources. Therefore, REST will be used to start and retrieve the game session information.
 - **GraphQL:** GraphQL is ideal when accessing large data sources, utilizing customize queries, and preventing over-fetching. Therefore, GraphQL will be used in retrieving the game events of a game session, such as the guesses of a user and the feedback of the server. This also prevents over-fetching because not all of the information will be necessary, such as the ids of game event and game session.
-- **WebSocket**: WebSocket is ideal when for real-time communication between the clients and server. In addition, websocket has low latency and reduced overhead compared to REST. Therefore, the client and server will utilize websocket communiation to submit guesses and provide feedback, respectively.
+- **WebSocket:** WebSocket is ideal when for real-time communication between the clients and server. In addition, websocket has low latency and reduced overhead compared to REST. Therefore, the client and server will utilize websocket communiation to submit guesses and provide feedback, respectively.
 
 **STORAGE:**
-- SQL: SQL is ideal for data integrity since it follows ACID principles.
-- NoSQL: NoSQL is ideal for availibility and requiring different forms of data stored. Since the Mastermind Project is a real-time game, NoSQL will be utilized for this project due to its availability.
+- **SQL:** SQL is ideal for data integrity since it follows ACID principles.
+- **NoSQL:** NoSQL is ideal for availibility and requiring different forms of data stored. Since the Mastermind Project is a real-time game, NoSQL will be utilized for this project due to its availability.
+
+### 4. High-Level Backend Design
+- To start the game and receive game session details from the client, the client makes REST api call to server at "/game-session" endpoint
+- To send guesses from client to server, the client sends websocket messages to server at "/guess" mapping
+- To receive game outcome (feedback, game won, game lost) from server to client, the server sends websocket message of game outcome to "/game-session/{game-sesssion-id}" websocket topic
+- To generate answer, server will send an API call to random.org at "/integers" endpoint
+- Game sessions will be stored on Redis
+- Game events will be stored on MongoDB
+
+### 5. Development Process
+1. Creating Java Spring app and React app
+2. Implement REST "game-session" endpoint
+3. Implement Redis to store game sessions
+    - Creating custom repository to interact with Redis
+4. Implement WebSocket to connect between client and server
+    - Send messages from client to server
+    - Send messages from server to client
+5. Implement MongoDB to store game session
+6. Implement GraphQL to store game events
+7. Implement main features of Mastermind:
+    - generate random number
+    - client send guess
+    - server send feedback
+    - server sending game won
+    - server sending game lost
+8. Implementing frontend:
+    - redux: state management
+    - axios: REST api calls
+    - apollo-client: GraphQL queries and mutations
+    - sockjs, socket-client, react-stomp: websocket communication
+        - created a context and provider for websocket so that child components can subscribe to a topic and send messages to a websocket mapping
+
+### 6. Obstacles
+**WEBSOCKET TOPICS:**
+When utilizing websocket, a client must subscribe to a websocket topic to receive messages from the server. As a result, I had two ideas for what the topic should be: the username or game session. If the topics were usernames, the user will be able to receive personalized messages by subscribing to their username id, which is more ideal for messaging applicaitons. However, this will require more overhead in terms of handling username information when sending messages. On the other hand, if the topics were game sessions, the client would be able to receive messages relating to the game events in the game session. Therefore, the game session were used as websocket topics.
+
+**GAME SESSION ID:**
+When implementing the game session ids, I had to ideas of what the id could be, such as a long/UUID value or a small string value of randomized characters. I chose to implement the game session ids as small string values since the game sessions are transient and might be difficult for the user to remember.
+
+**REDIS REPOSITORY:**
+Redis is usually used to cache information retrieved from a separate database, such as SQL and NoSQL. However, I needed to store the game session data only to Redis since game session are transient and will be necessary for an hour. To provide context: Repositories provide simple functions to interact with the database. Even though there weren't premade repositories, I implemented my own repository to interact with Redis by creating simple functions to access Redis.
+
+**REACT WEBSOCKET:**
+Even though the main focus of the project is the backend, the frontend did not have premade React components to utilize immediately for Stomp websocket for Java Spring. Therefore, I created a provider and context to subscribe to the game session topic and send messages to the server at different websocket mappings, so that the child components can be notified of new websocket messages to display them and to send websocket messages at different endpoints.
 
 ### 4. Backend Design
 The Java Spring application can be separated to the following components: configurations, controllers, model, repository, and services.
@@ -115,32 +159,32 @@ The Java Spring application can be separated to the following components: config
 **CONFIGURATIONS:**
 Since configurations are used to configure settings for components of the backend, the following configurations were used:
 To provide context: Beans are active components in the backend that are managed by Java Spring.
-- RedisConfiguration: used to create templates as the means to communicate to the Redis container for CRUD operations.
-- WebConfiguration: used to permit GraphQL requests from localhost:3000, which is where the React app is located.
-- WebSocketConfiguration: used for creating different endpoints for the client to establish a connection, to subscribe to a topic, and to send messages via WebSocket.
+- **RedisConfiguration**: used to create templates as the means to communicate to the Redis container for CRUD operations.
+- **WebConfiguration**: used to permit GraphQL requests from localhost:3000, which is where the React app is located.
+- **WebSocketConfiguration**: used for creating different endpoints for the client to establish a connection, to subscribe to a topic, and to send messages via WebSocket.
 
 **CONTROLLERS:**
 Since controllers are used to handle incoming requests and respond to them, the following controllers were created:
-- ApiRestController: used to handle REST requests from the client, such as starting a game session.
-- GraphQLController: used to handle GraphQL requests from the client, such as retrieving a list of game events of a session.
-- WebSocketController: used to handle incoming WebSocket messages from the client, such as making a guess.
+- **ApiRestController**: used to handle REST requests from the client, such as starting a game session.
+- **GraphQLController**: used to handle GraphQL requests from the client, such as retrieving a list of game events of a session.
+- **WebSocketController**: used to handle incoming WebSocket messages from the client, such as making a guess.
 
 **MODELS:**
 The following Java classes were created to be used as models:
-- GameEvent: stores important game events during a session, such as a description of what happened, along with the timestamp and game session id. GameEvent entries are stored in MongoDB.
-- GameSession: contains information of each game session, such as the game session id, the answer itself, the number of attempts left, etc.
+- **GameEvent**: stores important game events during a session, such as a description of what happened, along with the timestamp and game session id. GameEvent entries are stored in MongoDB.
+- **GameSession**: contains information of each game session, such as the game session id, the answer itself, the number of attempts left, etc.
 
 **REPOSITORIES:**
 The following respositories were used to interact with MongoDB and Redis.
-- GameEventRepository: provides CRUD functions to store game events to MongoDB.
-- GameSesssionRepsitory: custom repository that provides CRUD functions to store game sesesion to Redis.
+- **GameEventRepository**: provides CRUD functions to store game events to MongoDB.
+- **GameSesssionRepsitory**: custom repository that provides CRUD functions to store game sesesion to Redis.
 
 **SERVICES:**
-THe following are services that contain business logic:
-- GameEventService: provides simplified functions by interacting with GameEventRepository with error-handling.
-- GameSessionService: provides simplified functions by interacting with GameSessionRepository with error-handling.
-- RandomApiService: provides functions that communicate to the Random Integer API of random.org
-- WebSocketMessagingService: provides functions that send messages to websocket topics, such as game sessions.
+The following are services that contain business logic:
+- **GameEventService**: provides simplified functions by interacting with GameEventRepository with error-handling.
+- **GameSessionService**: provides simplified functions by interacting with GameSessionRepository with error-handling.
+- **RandomApiService**: provides functions that communicate to the Random Integer API of random.org
+- **WebSocketMessagingService**: provides functions that send messages to websocket topics, such as game sessions.
 
 ### 5. Frontend Design
 The React app will provide the user-interface of interacting with the backend. It utilizes the following technologies to provide an simplified experience of Mastermind:
@@ -162,7 +206,7 @@ The React app will provide the user-interface of interacting with the backend. I
 6. Client then takes the user to the game webpage to play mastermind
 
 **GUESS:**
-1. Client enters guess in text bok and presses "Submit" button.
+1. Client enters guess in textbox and presses "Submit" button.
 2. Client sends a message to the /guess websocket mapping.
 3. Backend receives game session id and guess from websocket message.
 4. Backend retrieves game session via GameSessionService with id.
@@ -183,16 +227,3 @@ The React app will provide the user-interface of interacting with the backend. I
 2. Backend creates game event of feedback of guess via GameEventService.
 3. Backend sends websocket message to game session topic of the feedback via WebSocketMessagingService.
 4. The client subscribed to the game session topic will receive the message and display the outcome to the user.
-
-### 6. Obstacles
-**WEBSOCKET TOPICS:**
-When utilizing websocket, a client must subscribe to a websocket topic to receive messages from the server. As a result, I had two ideas for what the topic should be: the username or game session. If the topics were usernames, the user will be able to receive personalized messages by subscribing to their username id, which is more ideal for messaging applicaitons. However, this will require more overhead in terms of handling username information when sending messages. On the other hand, if the topics were game sessions, the client would be able to receive messages relating to the game events in the game session. Therefore, the game session were used as websocket topics.
-
-**GAME SESSION ID:**
-When implementing the game session ids, I had to ideas of what the id could be, such as a long/UUID value or a small string value of randomized characters. I chose to implement the game session ids as small string values since the game sessions are transient and might be difficult for the user to remember.
-
-**REDIS REPOSITORY:**
-Redis is usually used to cache information retrieved from a separate database, such as SQL and NoSQL. However, I needed to store the game session data only to Redis since game session are transient and will be necessary for an hour. To provide context: Repositories provide simple functions to interact with the database. Even though there weren't premade repositories, I implemented my own repository to interact with Redis by creating simple functions to access Redis.
-
-**REACT WEBSOCKET:**
-Even though the main focus of the project is the backend, the frontend did not have premade React components  to utilize immediately for Stomp websocket for Java Spring. Therefore, I created a provider and context to subscribe to the game session topic and send messages to the server at different websocket mappings, so that the child components can be notified of new websocket messages to display them and to send websocket messages at different endpoints.
