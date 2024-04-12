@@ -10,15 +10,19 @@ public class GameSession implements Serializable {
     private String id;
     private String answer;
     private int attempts;
+    private boolean multiplayer;
+    private boolean started;
 
     public GameSession() {
         this.id = generateId();
     }
     
-    public GameSession(String answer, int attempts) {
+    public GameSession(String answer, int attempts, boolean multiplayer, boolean started) {
         this();
         this.answer = answer;
         this.attempts = attempts;
+        this.multiplayer = multiplayer;
+        this.started = started;
     }
 
     public String getId() {
@@ -45,6 +49,22 @@ public class GameSession implements Serializable {
         this.attempts = attempts;
     }
 
+    public boolean getMultiplayer() {
+        return multiplayer;
+    }
+
+    public void setIsMultiplayer(boolean multiplayer) {
+        this.multiplayer = multiplayer;
+    }
+
+    public boolean getStarted() {
+        return started;
+    }
+
+    public void setStarted(boolean started) {
+        this.started = started;
+    }
+
     // generates random id
     private String generateId() {
         int length = 8;
@@ -62,5 +82,5 @@ public class GameSession implements Serializable {
     @Override
     public String toString() {
         return String.format("GameSession{id=%s, answer=%s}", id, answer);
-    }    
+    }
 }

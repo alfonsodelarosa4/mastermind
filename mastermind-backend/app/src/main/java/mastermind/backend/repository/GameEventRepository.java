@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GameEventRepository extends MongoRepository<GameEvent, String> {
     List<GameEvent> findByGameSessionId(String gameSessionId);
+    void deleteByGameSessionId(String gameSessionId);
 }

@@ -3,7 +3,9 @@ import { BrowserRouter, Route, Routes, Outlet } from "react-router-dom";
 import styled from "styled-components";
 import "bootstrap/dist/css/bootstrap.min.css";
 import GameStart from './pages/GameStart';
-import MastermindPage from './pages/MastermindPage';
+import SoloMastermindPage from './pages/SoloMastermindPage';
+import GameLobby from './pages/GameLobby';
+import PartyMastermindPage from './pages/PartyMastermindPage';
 
 function App() {
   return (
@@ -16,7 +18,13 @@ function App() {
             </PageContainer>
           }>
             <Route index element={<GameStart />} />
-            <Route path="game" element={<MastermindPage />} />
+            <Route path="party" >
+              <Route index element={<GameLobby />} />
+              <Route path="game" element={<PartyMastermindPage />} />
+            </Route>
+            <Route path="solo">
+              <Route path="game" element={<SoloMastermindPage />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

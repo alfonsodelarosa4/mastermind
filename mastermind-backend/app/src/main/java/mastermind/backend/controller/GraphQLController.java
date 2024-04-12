@@ -30,7 +30,7 @@ public class GraphQLController {
     public List<GameEvent> getGameEventByGameSessionId(@Argument String gameSessionId) {
         try{
             // retrieve game event list
-            List<GameEvent> gameEventList = gameEventService.getGameEventByGameSessionId(gameSessionId);
+            List<GameEvent> gameEventList = gameEventService.getByGameSessionId(gameSessionId);
             return gameEventList;
         } catch(Exception e) {
             logger.error("Not able to retrieve game events of game session: {}", gameSessionId);

@@ -1,13 +1,13 @@
 package mastermind.backend.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import mastermind.backend.model.GameSession;
+import mastermind.backend.model.GameRoster;
 import mastermind.backend.service.GameEventService;
+import mastermind.backend.service.GameManagementService;
+import mastermind.backend.service.GameRosterService;
 import mastermind.backend.service.GameSessionService;
-import mastermind.backend.service.WebSocketMessagingService;
-import mastermind.backend.utils.GameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +23,19 @@ public class WebSocketController {
     @Autowired
     private GameEventService gameEventService;
     @Autowired
-    private final WebSocketMessagingService webSocketMessagingService;
+    private GameRosterService gameRosterService;
+    @Autowired
+    private GameManagementService gameManagementService;
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocketController.class);
 
     public WebSocketController(
            GameSessionService gameSessionService,
-           WebSocketMessagingService webSocketMessagingService) {
+           GameEventService gameEventService,
+           GameRosterService gameRosterService) {
         this.gameSessionService = gameSessionService;
-        this.webSocketMessagingService = webSocketMessagingService;
+        this.gameEventService = gameEventService;
+        this.gameRosterService = gameRosterService;
     }
 
     // receives guess from client
@@ -48,67 +52,65 @@ public class WebSocketController {
                 logger.error("GameSession not found");
                 throw new Exception("GameSession not found");
             }
-            GameSession currentGameSession = retrievedGameSession.get();
-            // get answer
-            String answer = currentGameSession.getAnswer();
+            GameSession gameSession = retrievedGameSession.get();
+
+            // Create username
+            String username = "Player";
+            if(gameSession.getMultiplayer()) {
+                username = receivedMessage.get("username");
+            }
+
             // document user's guess
-            gameEventService.createGameEvent(gameSessionId,String.format( "Player guessed %s.", guess));
-                        
-            // case: if they guess the answer correctly
+            gameEventService.create(gameSessionId,String.format( "%s guessed %s.", username, guess));
+            
+            // if multiplayer broadcast guess
+            if(gameSession.getMultiplayer()) gameManagementService.broadcastGuess(guess,gameSessionId,username);
+            
+            // get answer
+            String answer = gameSession.getAnswer();
+
+            // check if guess was correct
             if (guess.equals(answer)) {
-                logger.info("client guessed the answer!");
-                // document outcome
-                gameEventService.createGameEvent(gameSessionId,String.format( "Player won! %s was the answer.", answer));
-                // send response via webSocketMessagingService
-                Map<String, Object> outgoingMessage = new HashMap<>();
-                outgoingMessage.put("type", "GameWon");
-                outgoingMessage.put("content", "Congratulations. You won!");
-                webSocketMessagingService.sendMessageToGameSession(outgoingMessage, gameSessionId);
+                gameManagementService.gameWon(guess, gameSession, username);
                 return;
             }
-            // get attempts left
-            int attemptsLeft = currentGameSession.getAttempts() - 1;
-            
+
+            // send feedback from answer
+            boolean areThereMoreAttempts = gameManagementService.manageFeedback(guess, gameSession, username);
+
             // if no more attempts left
-            if (attemptsLeft == 0) {
-                logger.info("client lost");
-                // document outcome
-                gameEventService.createGameEvent(gameSessionId,String.format( "Player lost. %s was the answer.", answer));
-                // send game lost message
-                Map<String, Object> outgoingMessage = new HashMap<>();
-                outgoingMessage.put("type", "GameLost");
-                outgoingMessage.put("content", "Oh no! Game over.");
-                webSocketMessagingService.sendMessageToGameSession(outgoingMessage, gameSessionId);
-                // delete game session
-                gameSessionService.delete(gameSessionId);
+            if (!areThereMoreAttempts) {
+                gameManagementService.gameLost(gameSession);
                 return;
             }
 
-            // if still more attempts
-            
-            // generate feedback
-            int numberFeedback = GameUtils.getNumberFeedback(guess,answer);
-            int locationFeedback = GameUtils.getLocationFeedback(guess,answer);
+            // if multiplayer broadcast next person's turn
+            if (gameSession.getMultiplayer()) {
+                gameManagementService.broadcastPlayerTurn(gameSessionId);
+            }
 
-            logger.info("client guess incorrectly. feedback: correctNumber ({}). correctLocation ({})", numberFeedback, locationFeedback);
-            
-            // document outcome
-            gameEventService.createGameEvent(gameSessionId, String.format( "Player guessed incorrectly. %d correct number and %d correct location. %d attempts left.", 
-            numberFeedback, locationFeedback, attemptsLeft));
-
-            // send game feed message
-            Map<String, Object> outgoingMessage = new HashMap<>();
-            outgoingMessage.put("type", "Feedback");
-            outgoingMessage.put("correctNumber", numberFeedback);
-            outgoingMessage.put("correctLocation", locationFeedback);
-            outgoingMessage.put("attempts",attemptsLeft);
-            webSocketMessagingService.sendMessageToGameSession(outgoingMessage, gameSessionId);
-
-            // update game session
-            currentGameSession.setAttempts(attemptsLeft);
-            gameSessionService.update(currentGameSession);
         } catch(Exception e) {
             logger.error("handleGuess() error: " + e.getMessage());
+        }
+    }
+
+    @MessageMapping("/ready")
+    public void handleReady(@Payload Map<String, Object> receivedMessage) {
+        try {
+            logger.info("WS /ready: {}", receivedMessage);
+
+            // Access the values from the request body using keys
+            String gameSessionId = (String) receivedMessage.get("gameSessionId");
+            String username = (String) receivedMessage.get("username");
+            Boolean ready = (boolean) receivedMessage.get("ready");
+
+            // update player status
+            GameRoster gameRoster = gameRosterService.updatePlayer(gameSessionId,username,ready);
+
+            // broadcast new game roster
+            gameManagementService.checkIfAllReady(gameRoster);
+        } catch(Exception e) {
+            logger.error("handleReady() error: " + e.getMessage());
         }
     }
 

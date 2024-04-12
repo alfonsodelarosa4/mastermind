@@ -1,6 +1,5 @@
 package mastermind.backend.service;
 
-import java.util.Collections;
 import java.util.List;
 import mastermind.backend.model.GameEvent;
 import mastermind.backend.repository.GameEventRepository;
@@ -22,26 +21,34 @@ public class GameEventService {
     }
 
     // creates and saves game event to MongoDB
-    public void createGameEvent(String gameSessionId, String description) {
+    public void create(String gameSessionId, String description) throws Exception {
         logger.info("creating game event");
         try {
             GameEvent gameEvent = new GameEvent(gameSessionId, description);
             gameEventRepository.save(gameEvent);
             logger.info("created: {}", gameEvent);
         } catch(Exception e) {
-            logger.error("createGameEvent() error: " + e);
+            throw new Exception("createGameEvent() error: " + e.getMessage());
         }
     }
 
     // get game events by game session id
-    public List<GameEvent> getGameEventByGameSessionId(String gameSessionId) {
-        logger.info("retrieving game events of game session: {}",gameSessionId);
+    public List<GameEvent> getByGameSessionId(String gameSessionId) throws Exception{
         try {
+            logger.info("retrieving game events of game session: {}",gameSessionId);
             List<GameEvent> gameEventList = gameEventRepository.findByGameSessionId(gameSessionId);
             return gameEventList;
         } catch(Exception e) {
-            logger.error("Not able to retrieve game events of game session: {}", gameSessionId);
-            return Collections.emptyList();
+            throw new Exception("Not able to retrieve game events of game session: " + gameSessionId);
+        }
+    }
+
+    public void deleteByGameSessionId(String gameSessionId) throws Exception {
+        try {
+            logger.info("retrieving game events of game session: {}",gameSessionId);
+            gameEventRepository.deleteByGameSessionId(gameSessionId);
+        } catch(Exception e) {
+            throw new Exception("Not able to delete game events of game session: " + gameSessionId);
         }
     }
 }

@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   id: null,
-  attempts: null,
+  multiplayer: false
 };
 
 export const gameSessionSlice = createSlice({
@@ -10,21 +10,17 @@ export const gameSessionSlice = createSlice({
   initialState,
   reducers: {
     updateGameSession: (state, action) => {
-      const { id, attempts } = action.payload;
+      const { id, multiplayer } = action.payload;
       state.id = id;
-      state.attempts = attempts;
-    },
-    updateAttempts: (state, action) => {
-      const { attempts } = action.payload;
-      state.attempts = attempts;
+      state.multiplayer = multiplayer;
     },
     emptyGameSession: (state) => {
       state.id = null;
-      state.attempts = null;
+      state.multiplayer = false;
     }
   },
 });
 
-export const { updateGameSession, updateAttempts, emptyGameSession } = gameSessionSlice.actions
+export const { updateGameSession, emptyGameSession } = gameSessionSlice.actions
 
 export default gameSessionSlice.reducer

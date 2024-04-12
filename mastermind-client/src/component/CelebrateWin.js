@@ -3,7 +3,7 @@ import Confetti from 'react-confetti'
 import { useWebSocket } from "../component/WebSocketProvider";
 
 // celebrates win when GameWon message received
-export function CelebrateWin() {
+export default function CelebrateWin({enabled=true}) {
   const [celebrate, setCelebrate] = useState(false);
   const { newMessage } = useWebSocket();
 
@@ -17,7 +17,7 @@ export function CelebrateWin() {
   }, [newMessage])
   
   return (<>
-    {celebrate && (<Confetti />)}
+    {celebrate && enabled && (<Confetti />)}
     </>
   )
 }

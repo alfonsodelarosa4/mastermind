@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import { useWebSocket } from "../component/WebSocketProvider"
 import { useSelector } from "react-redux";
 import styled from "styled-components";
@@ -9,8 +9,11 @@ import Button from 'react-bootstrap/Button';
 import GameEventHistory from "./GameEventHistory";
 
 // allows user to make guess
-export default function GuessForm() {
+export default function GuessForm({enabled = true, attempts, enableHistory=true}) {
+  // redux
   const gameSession = useSelector((state => state.gameSession));
+  const partyGame = useSelector((state => state.partyGame));
+  // websocket
   const { newMessage, sendWebSocketMessage } = useWebSocket();
   const [guess, setGuess] = useState(null);
   const [show, setShow] = useState(true);
@@ -32,9 +35,18 @@ export default function GuessForm() {
   // submits guess
   const handleSubmit = (e) => {
     e.preventDefault();
-    const message = {
-      gameSessionId: gameSession.id,
-      guess: guess
+    var message = {};
+    if(gameSession.multiplayer) {
+      message = {
+        username: partyGame.username,
+        gameSessionId: gameSession.id,
+        guess: guess
+      }
+    } else {
+      message = {
+        gameSessionId: gameSession.id,
+        guess: guess
+      }
     }
     sendWebSocketMessage(message,"/guess")
   }
@@ -46,25 +58,25 @@ export default function GuessForm() {
   }
 
   return (
-    <Collapse in={show}>
+    <Collapse in={show && enabled}>
       <Card style={{ width: '30rem' }}>
-        <Card.Header>{gameSession.attempts} attempts left</Card.Header>      
+        <Card.Header>{attempts} attempts left</Card.Header>      
         <Card.Body>
           <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3" controlId="name">
-              <Form.Label>Guess the number</Form.Label>
-              <Form.Control 
-                type="text"
-                name="guess"
-                onChange={handleGuess}
-                placeholder="Type here"
-              />
+          <Form.Group className="mb-3" controlId="guess">
+            <Form.Label>Guess the number</Form.Label>
+            <Form.Control 
+              type="text"
+              name="guess"
+              onChange={handleGuess}
+              placeholder="Type here"
+            />
           </Form.Group>
           <ButtonSection>
               <Button variant="primary" type="submit">
                 Submit answer
               </Button>
-              <GameEventHistory />
+              {enableHistory && (<GameEventHistory />)}              
             </ButtonSection>
         </Form>
         </Card.Body>

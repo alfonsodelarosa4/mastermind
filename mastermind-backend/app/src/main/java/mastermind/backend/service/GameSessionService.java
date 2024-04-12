@@ -17,7 +17,11 @@ public class GameSessionService {
     @Autowired
     private RandomApiService randomApiService;
 
-    private static final Logger logger = LoggerFactory.getLogger(GameEventService.class);
+    private final int SOLO_ATTEMPTS = 10;
+
+    private final int MULTIPLAYER_ATTEMPTS = 5;
+
+    private static final Logger logger = LoggerFactory.getLogger(GameSessionService.class);
 
     public GameSessionService(
         GameSessionRepository gameSessionRepository,
@@ -28,11 +32,13 @@ public class GameSessionService {
     }
 
     // create game session
-    public GameSession create() {
+    public GameSession create(boolean multiplayer, boolean started) {
         // generate number
         String answer = randomApiService.getRandomInteger(4,0,7);
+        // get attempts
+        int attempts = multiplayer ? MULTIPLAYER_ATTEMPTS : SOLO_ATTEMPTS;
         // create game session
-        GameSession gameSession = new GameSession(answer,10);
+        GameSession gameSession = new GameSession(answer,attempts, multiplayer,started);
         logger.info("Created: {}", gameSession);
         // store to redis
         gameSessionRepository.save(gameSession);
@@ -55,5 +61,21 @@ public class GameSessionService {
     public void delete(String id) {
         gameSessionRepository.delete(id);
     }
-    
+
+    // decrement attempts in game session
+    public void decrementAttempts(String id) throws Exception {
+        // get game session
+        Optional<GameSession> existingGameSession = gameSessionRepository.findById(id);
+        if(!existingGameSession.isPresent()) {
+            throw new Exception(String.format("Game session %s not found.", id));
+        }
+        GameSession gameSession = existingGameSession.get();
+
+        int newAttempts = gameSession.getAttempts() - 1;
+
+        gameSession.setAttempts(newAttempts);
+
+        // update game session
+        gameSessionRepository.save(gameSession);
+    }    
 }
