@@ -2,6 +2,16 @@
 ## Overview
 I'm Alfonso De La Rosa. This is my project submission for the LinkedIn Apprenticeship: Mastermind. Mastermind is a game, where the player guesses the number combinations. This is a fullstack project that uses React for the frontend and Java Spring for the backend. The Java Spring app accepts REST and GraphQL api requests from the client and supports websocket communication with the client. In addition, the Java Spring app stores game sessions to Redis and game events to MongoDB. I added multiplayer extension that allows users to create and joint multiplayer sessions and compete with their friends.
 
+Main technologies used for this project:
+- **Java Spring Boot:** the application framework for the backend
+- **REST:** client-to-server communication
+- **GraphQL:** client-to-server communiation
+- **MongoDB:** storing game events
+- **Docker:** containers
+- **React and Redux:** frontend and state management
+- **Redis:** saving temporary data for game sessions
+- **WebSocket:** bidirectional communication between the client and server
+
 ## Building and Running the application
 **NOTE**: I developed, build, and ran my application on a Windows computer.
 ### 1. Required technologies: NodeJS, Gradle, JDK 21, and Docker
@@ -111,7 +121,7 @@ Before doing anything, I spent time reading the challenge requirements and made 
 
 ### 2. Technologies to use
 After understanding the requirements, I took into account of the technologies I was already familiar with and labeled its application to the project:
-- **Java Spring:** the application framework for the backend
+- **Java Spring Boot:** the application framework for the backend
 - **REST:** client-to-server communication
 - **GraphQL:** client-to-server communiation
 - **MongoDB:** storing game events
