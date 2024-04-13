@@ -1,6 +1,6 @@
 # Mastermind Project Submission
 ## Overview
-I'm Alfonso De La Rosa. This is my project submission for the LinkedIn Apprenticeship: Mastermind. Mastermind is a game, where the player guesses the number combinations. This is a fullstack project that uses React for the frontend and Java Spring for the backend. The Java Spring app accepts REST and GraphQL api requests from the client and supports WebSocket communication with the client. In addition, the Java Spring app stores game sessions to Redis and game events to MongoDB.
+I'm Alfonso De La Rosa. This is my project submission for the LinkedIn Apprenticeship: Mastermind. Mastermind is a game, where the player guesses the number combinations. This is a fullstack project that uses React for the frontend and Java Spring for the backend. The Java Spring app accepts REST and GraphQL api requests from the client and supports WebSocket communication with the client. In addition, the Java Spring app stores game sessions to Redis and game events to MongoDB. I added multiplayer extension that allows users to create and joint multiplayer sessions and compete with their friends.
 
 ## Building and Running the application
 I developed, build, and ran my application on a Windows computer.
@@ -153,7 +153,7 @@ Redis is usually used to cache information retrieved from a separate database, s
 **REACT WEBSOCKET:**
 Even though the main focus of the project is the backend, the frontend did not have premade React components to utilize immediately for Stomp websocket for Java Spring. Therefore, I created a provider and context to subscribe to the game session topic and send messages to the server at different websocket mappings, so that the child components can be notified of new websocket messages to display them and to send websocket messages at different endpoints.
 
-### 4. Backend Design
+### 7. Backend Design
 The Java Spring application can be separated to the following components: configurations, controllers, model, repository, and services.
 
 **CONFIGURATIONS:**
@@ -186,7 +186,7 @@ The following are services that contain business logic:
 - **RandomApiService**: provides functions that communicate to the Random Integer API of random.org
 - **WebSocketMessagingService**: provides functions that send messages to websocket topics, such as game sessions.
 
-### 5. Frontend Design
+### 8. Frontend Design
 The React app will provide the user-interface of interacting with the backend. It utilizes the following technologies to provide an simplified experience of Mastermind:
 - redux: state management of game sessions.
 - bootstrap: provides components made by Bootstrap.
@@ -195,7 +195,7 @@ The React app will provide the user-interface of interacting with the backend. I
 - react-router: enables client-side routing to navigate different webpages.
 - sockjs, socketclient, react-stomp: enables websocket communication between client and server.
 
-### 6. Backend Workflow
+### 9. Backend Workflow
 **GAME START:** 
 1. Client presses the "Play Mastermind" button
 2. Client makes a REST POST call at /game-session endpoint to create a game session
@@ -227,3 +227,36 @@ The React app will provide the user-interface of interacting with the backend. I
 2. Backend creates game event of feedback of guess via GameEventService.
 3. Backend sends websocket message to game session topic of the feedback via WebSocketMessagingService.
 4. The client subscribed to the game session topic will receive the message and display the outcome to the user.
+
+### 10. Extension: Multiplayer
+Implementing multiplayer required changing some components of the Java Spring app (and the React app) and adding more components:
+
+1. **Requirements**:
+- User will have the option to create solo or multiplayer game.
+- User will be able to join game sessions. 
+- User will need to create a username in a multiplayer game.
+- Multiplayer game will need to faciliate a game lobby.
+- Users in game lobby will be able to state ready or not to play.
+- Users in game lobby will be able see who has joined and who is ready to play.
+- Users in multiplayer session will be taken to actual game page to play.
+- Multiplayer game must implement player turn functionality, such as announcing the turn of the current player.
+- Multiplayer game must also provide remaining # of turns of player who guessed.
+- Multiplayer game must announce feedback to a player's guess to all players.
+- Multiplayer game must be able to announce winner of game if someone won.
+- Multiplayer game must be able to announce end of game if everyone lost.
+
+2. **Changes/Additions**:
+- **/game-session POST REST endpoint**: modified to create game sessions for solo game and multiplayer game and return appropriate responses.
+- **GameSession model**: multiplayer value.
+- **GameRoster model**: created to store players who are joined the session and whether they are ready to play. Stored on Redis.
+- **/join-game-session POST REST endpoint**: created to allow players to join game session.
+- **/ready WebSocket mapping**: created to allow players to state ready/not ready for game session.
+- **"Roster" websocket message**: sent to announce new player list every time someone joins.
+- **GameTurns model**: stores turn of current player and list of attempts left of each player
+- Repositories and services were created for GameRoster and GameTurns. Stored on Redis.
+- **"NextTurn" websocket message**: sent to announce the next turn of the game.
+- **GameManagementService**: provides important functions to handle both solo and multiplayer games, such as providing feedback, broadcasting messages to players, handling end of game states, and etc.
+- **Frontend**:
+    - Handling responses from /game-session and /join-game-session
+    - Create states specifically for solo games and multiplayer games
+    - Add more pages and components for multiplayer, such as join game, game lobby, and multiplayer mastermind game page
