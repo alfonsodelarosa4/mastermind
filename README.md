@@ -5,12 +5,12 @@ I'm Alfonso De La Rosa. This is my project submission for the LinkedIn Apprentic
 Main technologies used for this project:
 - **Java Spring Boot:** the application framework for the backend
 - **REST:** client-to-server communication
-- **GraphQL:** client-to-server communiation
+- **GraphQL:** client-to-server communication
+- **WebSocket:** bidirectional communication between the client and server
 - **MongoDB:** storing game events
+- **Redis:** saving temporary data for game sessions
 - **Docker:** containers
 - **React and Redux:** frontend and state management
-- **Redis:** saving temporary data for game sessions
-- **WebSocket:** bidirectional communication between the client and server
 
 ## Building and Running the application
 **NOTE**: I developed, build, and ran my application on a Windows computer.
@@ -64,7 +64,7 @@ npm start
 - The Java Spring app is running with Gradle
 - The React app is running with NodeJS
 
-**HOW TO PLAY SINGLEPLAYER:**
+**HOW TO PLAY SINGLE PLAYER:**
 1. Open the React app in one browser tab: [Here is the link](http://localhost:3000/)
 2. Select **Solo**
 3. Press **Play Mastermind 😀**
@@ -94,7 +94,7 @@ Before doing anything, I spent time reading the challenge requirements and made 
 
 **USER:**
 - The user will play "against" the computer and try to guess the number of combinations
-- After each attempt, the computer will provide feedback whether the player had guess a number correcly.
+- After each attempt, the computer will provide feedback whether the player had guess a number correctly.
 - Player must guess the right number of combinations within 10 attempts.
 
 **SERVER:**
@@ -112,7 +112,7 @@ Before doing anything, I spent time reading the challenge requirements and made 
     - to view number of guesses remaining is displayed.
 
 **EXTENSIONS:**
-- We are encouranged to expand the game to showcase talents and passion.
+- We are encouraged to expand the game to showcase talents and passion.
 
 **FEEDBACK:**
 - I realized the meaning of each value: correct number and correct location. After reading the examples, I made the following findings:
@@ -123,7 +123,7 @@ Before doing anything, I spent time reading the challenge requirements and made 
 After understanding the requirements, I took into account of the technologies I was already familiar with and labeled its application to the project:
 - **Java Spring Boot:** the application framework for the backend
 - **REST:** client-to-server communication
-- **GraphQL:** client-to-server communiation
+- **GraphQL:** client-to-server communication
 - **MongoDB:** storing game events
 - **Docker:** containers
 - **React and Redux:** frontend and state management
@@ -137,16 +137,16 @@ Even though I have not had experiences working with these technologies, I spent 
 **COMMUNICATION:**
 - **REST:** REST is ideal when a client want to access simple data sources. Therefore, REST will be used to start and retrieve the game session information.
 - **GraphQL:** GraphQL is ideal when accessing large data sources, utilizing customize queries, and preventing over-fetching. Therefore, GraphQL will be used in retrieving the game events of a game session, such as the guesses of a user and the feedback of the server. This also prevents over-fetching because not all of the information will be necessary, such as the ids of game event and game session.
-- **WebSocket:** WebSocket is ideal when for real-time communication between the clients and server. In addition, websocket has low latency and reduced overhead compared to REST. Therefore, the client and server will utilize websocket communiation to submit guesses and provide feedback, respectively.
+- **WebSocket:** WebSocket is ideal when for real-time communication between the clients and server. In addition, websocket has low latency and reduced overhead compared to REST. Therefore, the client and server will utilize websocket communication to submit guesses and provide feedback, respectively.
 
 **STORAGE:**
 - **SQL:** SQL is ideal for data integrity since it follows ACID principles.
-- **NoSQL:** NoSQL is ideal for availibility and requiring different forms of data stored. Since the Mastermind Project is a real-time game, NoSQL, such as MongoDB, will be utilized for this project due to its availability instead of SQL.
+- **NoSQL:** NoSQL is ideal for availability and requiring different forms of data stored. Since the Mastermind Project is a real-time game, NoSQL, such as MongoDB, will be utilized for this project due to its availability instead of SQL.
 
 ### 4. High-Level Backend Design
 - To start the game and receive game session details from the client, the client makes REST api call to server at "/game-session" endpoint
 - To send guesses from client to server, the client sends websocket messages to server at "/guess" mapping
-- To receive game outcome (feedback, game won, game lost) from server to client, the server sends websocket message of game outcome to "/game-session/{game-sesssion-id}" websocket topic
+- To receive game outcome (feedback, game won, game lost) from server to client, the server sends websocket message of game outcome to "/game-session/{game-session-id}" websocket topic
 - To generate answer, server will send an API call to random.org at "/integers" endpoint
 - To view the game history, the client will make a GraphQL query to retrieve a list of game events: getGameEventByGameSessionId
 - Game sessions will be stored on Redis
@@ -183,10 +183,10 @@ When utilizing websocket, a client must subscribe to a websocket topic to receiv
 When implementing the game session ids, I considered 2 formats, such as a long/UUID value or a small string value of randomized characters. I chose to implement the game session ids as small string values since the game sessions are transient and might be difficult for the user to remember.
 
 **REDIS REPOSITORY:**
-Redis is usually used to cache information retrieved from a separate database, such as SQL and NoSQL. However, I needed to store the game session data only to Redis since game session are transient and will be necessary for an hour. To provide context: Repositories provide simple functions to interact with the database. Even though there weren't premade repositories, I implemented my own repository to interact with Redis by creating simple functions to access Redis.
+Redis is usually used to cache information retrieved from a separate database, such as SQL and NoSQL. However, I needed to store the game session data only to Redis since game session are transient and will be necessary for an hour. To provide context: Repositories provide simple functions to interact with the database. Even though there weren't official repositories, I implemented my own repository to interact with Redis by creating simple functions to access Redis.
 
 **REACT WEBSOCKET:**
-The frontend did not have premade React components to utilize immediately for Stomp websocket for Java Spring. Therefore, I created a provider and context to subscribe to the game session topic and send messages to the server at different websocket mappings, so that the child components can be notified of new websocket messages to display them and to send websocket messages at different endpoints.
+The frontend did not have official React components to utilize immediately for Stomp websocket for Java Spring. Therefore, I created a provider and context to subscribe to the game session topic and send messages to the server at different websocket mappings, so that the child components can be notified of new websocket messages to display them and to send websocket messages at different endpoints.
 
 ### 7. Backend Design
 The Java Spring application can be separated to the following components: configurations, controllers, model, repository, and services.
@@ -209,9 +209,9 @@ The following Java classes were created to be used as models:
 - **GameSession**: contains information of each game session, such as the game session id, the answer itself, the number of attempts left, etc.
 
 **REPOSITORIES:**
-The following respositories were used to interact with MongoDB and Redis.
+The following repositories were used to interact with MongoDB and Redis.
 - **GameEventRepository**: provides CRUD functions to store game events to MongoDB.
-- **GameSesssionRepsitory**: custom repository that provides CRUD functions to store game sesesion to Redis.
+- **GameSesssionRepsitory**: custom repository that provides CRUD functions to store game session to Redis.
 
 **SERVICES:**
 The following are services that contain business logic:
@@ -265,7 +265,7 @@ The React app will provide the user-interface of interacting with the backend. I
 **GAME SESSION HISTORY:**
 1. User clicks the "Show Game History" button.
 2. Client makes GraphQL query to retrieve the game events
-3. Client diisplays the game events to the user.
+3. Client displays the game events to the user.
 
 ### 10. Extension: Multiplayer
 Implementing multiplayer required changing some components of the Java Spring app (and the React app) and adding more components:
@@ -274,7 +274,7 @@ Implementing multiplayer required changing some components of the Java Spring ap
 - User will have the option to create single-player game or multiplayer game.
 - User will be able to join game sessions. 
 - User will need to create a username in a multiplayer game.
-- Multiplayer game will need to faciliate a game lobby.
+- Multiplayer game will need to facilitate a game lobby.
 - Users in game lobby will be able to state ready or not to play.
 - Users in game lobby will be able see who has joined and who is ready to play.
 - Users in multiplayer session will be taken to actual game page to play once all users are ready to play.
