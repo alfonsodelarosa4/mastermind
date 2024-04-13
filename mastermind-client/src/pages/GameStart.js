@@ -101,7 +101,7 @@ export default function GameStart() {
                 </Form.Group>
                 <Collapse in={multiplayer ==="true"}>
                 <Form.Group className="mb-3" controlId="username">
-                  <Form.Label>Create a username</Form.Label>
+                  <Form.Label>Enter username</Form.Label>
                   <Form.Control 
                     type="text"
                     name="username"
@@ -125,7 +125,7 @@ export default function GameStart() {
               <Card.Title>Join someone's Mastermind game</Card.Title>
               <Form >
                 <Form.Group className="mb-3" controlId="username">
-                  <Form.Label>Enter the game session code</Form.Label>
+                  <Form.Label>Enter game session code</Form.Label>
                   <Form.Control 
                     type="text"
                     name="username"
@@ -133,7 +133,7 @@ export default function GameStart() {
                   />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="username">
-                  <Form.Label>Create a username</Form.Label>
+                  <Form.Label>Enter username</Form.Label>
                   <Form.Control 
                     type="text"
                     name="username"

@@ -35,7 +35,7 @@ export default function TurnDisplay() {
       >
       <Card.Header>{partyGame.username}</Card.Header>
       <Card.Body>
-        <Card.Title>{partyGame.username == partyGame.currentTurn? 
+        <Card.Title>{partyGame.username === partyGame.currentTurn? 
           `It's your turn`: `It's ${partyGame.currentTurn}'s turn` }
         </Card.Title>
         < GameEventHistory />

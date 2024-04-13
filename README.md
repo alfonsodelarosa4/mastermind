@@ -3,7 +3,7 @@
 I'm Alfonso De La Rosa. This is my project submission for the LinkedIn Apprenticeship: Mastermind. Mastermind is a game, where the player guesses the number combinations. This is a fullstack project that uses React for the frontend and Java Spring for the backend. The Java Spring app accepts REST and GraphQL api requests from the client and supports WebSocket communication with the client. In addition, the Java Spring app stores game sessions to Redis and game events to MongoDB. I added multiplayer extension that allows users to create and joint multiplayer sessions and compete with their friends.
 
 ## Building and Running the application
-I developed, build, and ran my application on a Windows computer.
+**NOTE**: I developed, build, and ran my application on a Windows computer.
 ### 1. Required technologies NodeJS, Gradle, JDK 21, and Docker
 The following technologies are required to run the application:
 1. **NodeJS**: Installers are provided below (for Linux, macOS, Windows):
@@ -48,11 +48,35 @@ cd mastermind-client
 npm start
 ```
 4. Now leave this terminal alone
-### 5. How to use the application
-1. [Click here to open the React app](http://localhost:3000/)
-2. This is the game start screen. You simply click on the blue button to start playing.
-3. You have 10 attempts to guess the correct number. Enter your guess in the text box. Then press enter to submit.
-4. After pressing submit, you should receive a response from the Spring server
+### 5. How to open the application
+**NOTE**: The following should be running before trying to play the application:
+- The Docker containers of Redis and MongoDB
+- The Java Spring app is running with Gradle
+- The React app is running with NodeJS
+
+**HOW TO PLAY SINGLEPLAYER:**
+1. Open the React app in one browser tab: [Here is the link](http://localhost:3000/)
+2. Select **Solo**
+3. Press **Play Mastermind 😀**
+4. Under the "Guess the combination", enter a 4-digit combination and press **Submit Answer**
+5. To view previous game events, press **Show Game History**
+6. To look at the answer, refer to the terminal of the Java Spring app that is running. It can be found next to: **getRandomInteger(): generated**
+
+**HOW TO PLAY MULTIPLAYER:** 
+1. To test multiplayer, one tab will simulate one player. There will be two types of players: one who creates the game session and the rest who join the game session.
+2. **As game creator:** Open the React app in one browser tab: [Here is the link](http://localhost:3000/)
+3. **As game creator:** Select **With friends**
+4. **As game creator:** Enter any username
+5. **As game creator:** Press **Play Mastermind 😀**
+6. **As game joiner:** Open the React app in a different browser tab: [Here is the link](http://localhost:3000/)
+7. **As game joiner:** Click on **Join Game** tab
+8. **As game joiner:** Enter game session code (which is shown in game creator screen)
+9. **As game joiner:** Enter any username
+10. **As game joiner:** Press **Join 😀**
+11. **As all players:** Press **Ready**
+12. **As all players:** Wait for your turn. When it's your turn, enter your guess.
+13. **As all players:** To view previous game events, press **Show Game History**
+14. To look at the answer, refer to the terminal of the Java Spring app that is running. It can be found next to: **getRandomInteger(): generated**
 
 ## Project Development
 ### 1. Understanding the challenge

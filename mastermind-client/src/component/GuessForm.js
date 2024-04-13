@@ -64,7 +64,7 @@ export default function GuessForm({enabled = true, attempts, enableHistory=true}
         <Card.Body>
           <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3" controlId="guess">
-            <Form.Label>Guess the number</Form.Label>
+            <Form.Label>Guess the combination</Form.Label>
             <Form.Control 
               type="text"
               name="guess"
